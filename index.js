@@ -1,11 +1,12 @@
 const { executionAsyncResource } = require('async_hooks');
 const Discord = require('discord.js');
+const { measureMemory } = require('vm');
 const ytdl = require('ytdl-core');
 
 const { YTSearcher } = require('ytsearcher');
 
 const searcher = new YTSearcher({
-    key: process.env.youtube_api,
+    key: "AIzaSyCo41pba4U2DSoWhBxSHYj1R1apkfHXV4A",
     revealed: true
 });
 
@@ -20,6 +21,8 @@ client.on("ready", () => {
 client.on("message", async(message) => {
     const prefix = '!';
 
+    if(!message.content.startsWith(prefix)) return
+
     const serverQueue = queue.get(message.guild.id);
 
     const args = message.content.slice(prefix.length).trim().split(/ +/g)
@@ -32,8 +35,11 @@ client.on("message", async(message) => {
         case 'stop':
             stop(message, serverQueue);
             break;
-        case 'skip':
+        case 'fskip':
             skip(message, serverQueue);
+            break;
+        case 'skip':
+            vSkip(serverQueue);
             break;
         case 'pause':
             pause(serverQueue);
@@ -50,6 +56,9 @@ client.on("message", async(message) => {
         }
 
     async function execute(message, serverQueue){
+        if(args.length <= 0)
+            return message.channel.send("Please write the name of the song")
+
         let vc = message.member.voice.channel;
         if(!vc){
             return message.channel.send("Please join a voice chat first");
@@ -71,7 +80,8 @@ client.on("message", async(message) => {
                     volume: 10,
                     playing: true,
                     loopone: false,
-                    loopall: false
+                    loopall: false,
+                    skipVotes: []
                 };
                 queue.set(message.guild.id, queueConstructor);
 
@@ -80,6 +90,7 @@ client.on("message", async(message) => {
                 try{
                     let connection = await vc.join();
                     queueConstructor.connection = connection;
+                    message.guild.me.voice.setSelfDeaf(true);
                     play(message.guild, queueConstructor.songs[0]);
                 }catch (err){
                     console.error(err);
@@ -116,22 +127,54 @@ client.on("message", async(message) => {
             serverQueue.txtChannel.send(`Now playing ${serverQueue.songs[0].url}`)
     }
     function stop (message, serverQueue){
-        if(!message.member.voice.channel)
+        if(!serverQueue)
+            return message.channel.send("There is no music playing!")
+        if(message.member.voice.channel != message.guild.me.voice.channel)
             return message.channel.send("You need to join the voice chat first!")
         serverQueue.songs = [];
         serverQueue.connection.dispatcher.end();
     }
     function skip (message, serverQueue){
-        if(!message.member.voice.channel)
+        if(message.member.voice.channel != message.guild.me.voice.channel)
             return message.channel.send("You need to join the voice chat first");
         if(!serverQueue)
             return message.channel.send("There is nothing to skip!");
+
+        let roleN = message.guild.roles.cache.find(role => role.name === "DJ")
+
+        if(!message.member.roles.cache.get(roleN.id))
+            return message.channel.send("You don't have the DJ role");
+
         serverQueue.connection.dispatcher.end();
+        serverQueue.skipVotes = []
     }
-    function pause(serverQueue){
-        if(!serverQueue.connection)
+
+    function vSkip(serverQueue){
+        if(!serverQueue)
             return message.channel.send("There is no music currently playing!");
-        if(!message.member.voice.channel)
+        if(message.member.voice.channel != message.guild.me.voice.channel)
+            return message.channel.send("You are not in the voice channel!");
+        
+        let usersC = message.member.voice.channel.members.size;
+        let required = Math.ceil(usersC/2);
+
+        if(serverQueue.skipVotes.includes(message.member.id))
+            return message.channel.send("You already voted to skip!")
+
+        serverQueue.skipVotes.push(message.member.id)
+        message.channel.send(`You voted to skip the song ${serverQueue.skipVotes.length}/${required} votes`)
+
+        if(serverQueue.skipVotes.length >= required){
+            serverQueue.connection.dispatcher.end();
+            serverQueue.skipVotes = [];
+            message.channel.send("Song has been skipped")
+        }
+    }
+
+    function pause(serverQueue){
+        if(!serverQueue)
+            return message.channel.send("There is no music currently playing!");
+        if(message.member.voice.channel != message.guild.me.voice.channel)
             return message.channel.send("You are not in the voice channel!")
         if(serverQueue.connection.dispatcher.paused)
             return message.channel.send("The song is already paused");
@@ -139,9 +182,9 @@ client.on("message", async(message) => {
         message.channel.send("The song has been paused!");
     }
     function resume(serverQueue){
-        if(!serverQueue.connection)
+        if(!serverQueue)
             return message.channel.send("There is no music currently playing!");
-        if(!message.member.voice.channel)
+        if(message.member.voice.channel != message.guild.me.voice.channel)
             return message.channel.send("You are not in the voice channel!")
         if(serverQueue.connection.dispatcher.resumed)
             return message.channel.send("The song is already playing!");
@@ -149,9 +192,9 @@ client.on("message", async(message) => {
         message.channel.send("The song has been resumed!");
     }
     function Loop(args, serverQueue){
-        if(!serverQueue.connection)
+        if(!serverQueue)
             return message.channel.send("There is no music currently playing!");
-        if(!message.member.voice.channel)
+        if(message.member.voice.channel != message.guild.me.voice.channel)
             return message.channel.send("You are not in the voice channel!")
 
         switch(args[0].toLowerCase()){
@@ -185,9 +228,9 @@ client.on("message", async(message) => {
         }
     }
     function Queue(serverQueue){
-        if(!serverQueue.connection)
+        if(!serverQueue)
             return message.channel.send("There is no music currently playing!");
-        if(!message.member.voice.channel)
+        if(message.member.voice.channel != message.guild.me.voice.channel)
             return message.channel.send("You are not in the voice channel!")
 
         let nowPlaying = serverQueue.songs[0];
@@ -201,4 +244,4 @@ client.on("message", async(message) => {
     }
 })
 
-client.login(process.env.token)
+client.login("NzY4ODc2OTU5NTM4ODcyMzIx.X5G2eA.Go0EpCAdB-fzPZ95Lhbee9wme0g")
