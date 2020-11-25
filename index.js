@@ -6,7 +6,7 @@ const ytdl = require('ytdl-core');
 const { YTSearcher } = require('ytsearcher');
 
 const searcher = new YTSearcher({
-    key: "AIzaSyCo41pba4U2DSoWhBxSHYj1R1apkfHXV4A",
+    key: process.env.youtube_api,
     revealed: true
 });
 
@@ -146,7 +146,7 @@ client.on("message", async(message) => {
             return message.channel.send("You don't have the DJ role");
 
         serverQueue.connection.dispatcher.end();
-        serverQueue.skipVotes = []
+        serverQueue.skipVotes = [];
     }
 
     function vSkip(serverQueue){
@@ -244,4 +244,4 @@ client.on("message", async(message) => {
     }
 })
 
-client.login("NzY4ODc2OTU5NTM4ODcyMzIx.X5G2eA.Go0EpCAdB-fzPZ95Lhbee9wme0g")
+client.login(process.env.token)
