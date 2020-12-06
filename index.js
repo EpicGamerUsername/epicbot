@@ -59,4 +59,9 @@ client.on("message", async(message) => {
         
 })
 
+client.on('guildMemberAdd', member => {
+    let role = message.guild.roles.cache.find(role => role.name === "Epic Gamers")
+    member.roles.add(role)
+})
+
 client.login(process.env.token)
