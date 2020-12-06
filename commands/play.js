@@ -18,14 +18,13 @@ module.exports.run = async (client, message, args, queue, searcher) => {
                 })
             })
         }catch(err){
-            return message.channel.send(`Please insert a valid link....\n${err}`)
+            return message.channel.send(`Please insert a valid link or make sure that the playlist is visible\n${err}`)
         }
     }
     else{
         let result = await searcher.search(args.join(" "), { type: "video" })
         if(result.first == null)
             return message.channel.send("There are no results found");
-
         let songInfo = await ytdl.getInfo(result.first.url);
         return videoHandler(songInfo, message, vc)
     }
@@ -72,7 +71,7 @@ module.exports.run = async (client, message, args, queue, searcher) => {
             let dur = `${parseInt(song.vLength / 60)}:${song.vLength - 60 * parseInt(song.vLength / 60)}`
             let msg = new Discord.MessageEmbed()
                 .setTitle("Song Added")
-                .addField(song.title, "_____")
+                .addField(song.title, "-----------")
                 .addField("Song duration: ", dur)
                 .setThumbnail(song.thumbnail)
                 .setColor("PURPLE")
@@ -103,7 +102,7 @@ module.exports.run = async (client, message, args, queue, searcher) => {
             let dur = `${parseInt(serverQueue.songs[0].vLength / 60)}:${serverQueue.songs[0].vLength - 60 * parseInt(serverQueue.songs[0].vLength / 60)}`
             let msg = new Discord.MessageEmbed()
                 .setTitle("Now Playing:")
-                .addField(serverQueue.songs[0].title, "_____")
+                .addField(serverQueue.songs[0].title, "----------")
                 .addField("Song duration: ", dur)
                 .setThumbnail(serverQueue.songs[0].thumbnail)
                 .setColor("PURPLE")
