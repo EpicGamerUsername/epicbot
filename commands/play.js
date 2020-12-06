@@ -6,7 +6,8 @@ module.exports.run = async (client, message, args, queue, searcher) => {
     const vc = message.member.voice.channel;
     if(!vc)
         return message.channel.send("Please join a voice channel first");
-    
+    if (args.length < 1)
+        return message.channel.send("Please enter something to search")
     let url = args.join("");
     if(url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)){
         try{
