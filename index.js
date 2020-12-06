@@ -60,7 +60,7 @@ client.on("message", async(message) => {
 })
 
 client.on('guildMemberAdd', member => {
-    let role = message.guild.roles.cache.find(role => role.name === "Epic Gamers")
+    let role = member.guild.roles.cache.find(role => role.name === "Epic Gamers")
     member.roles.add(role)
 })
 
