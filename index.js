@@ -37,6 +37,14 @@ client.on("ready", () => {
     console.log("I am online!")
 })
 
+
+client.on("guildMemberAdd", member => {
+    let role = member.guild.roles.cache.find(role => role.name === "Epic Gamers")
+    console.log(role)
+    member.roles.add(role)
+})
+
+
 client.on("message", async(message) => {
     const prefix = '!';
 
@@ -59,9 +67,4 @@ client.on("message", async(message) => {
         
 })
 
-client.on('guildMemberAdd', member => {
-    let role = member.guild.roles.cache.find(role => role.name === "Epic Gamers")
-    member.roles.add(role)
-})
-
-client.login(process.env.token)
+client.login("NzY4ODc2OTU5NTM4ODcyMzIx.X5G2eA.lG6P0h7xGA1VwPPq3FHZtZq66hU")
