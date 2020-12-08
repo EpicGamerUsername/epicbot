@@ -15,15 +15,7 @@ module.exports.run = async (client, message, args, queue, searcher) => {
             await ytpl(url).then(async playlist => {
                 message.channel.send(`The playlist: "${playlist.title}" has been added`)
                 playlist.items.forEach(async item => {
-                    try {                        
-                        await videoHandler(await ytdl.getInfo(item.shortUrl), message, vc, true);
-                        tries += 1;
-                        if(tries >= 2)
-                        break;
-                    }catch(err){
-                        message.channel.send(`Cannot queue song :c \n ${err} `)
-                        console.log(err)
-                    }    
+                    await videoHandler(await ytdl.getInfo(item.shortUrl), message, vc, true);
                 })
             })
         }catch(err){
