@@ -27,8 +27,11 @@ function promo(message, args, rolename = ""){
     let role = message.guild.roles.cache.find(role => role.name === rolename)
     if (!role)
         return message.channel.send(`The role ${args[0]} is not a role`)
+    if(message.member.roles.cache.get(role.id))
+        return message.channel.send("You already have that role")
 
     message.member.roles.add(role);
+    message.react("785179671041671168")
 }
 
 module.exports.config = {
