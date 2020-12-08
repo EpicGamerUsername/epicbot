@@ -7,14 +7,14 @@ module.exports.run = (client, message, args, queue, searcher) => {
     switch(args[0].toLowerCase()){
         case 'javascript':
         case 'js':
-            promo(message, args[0]);
+            promo(message, args[0], "javascript");
             break;
         case 'python':
         case 'py':
-            promo(message, args[0])
+            promo(message, args[0], "python");
             break;
         case 'gamer':
-            promo(message, args[0])
+            promo(message, args[0], "gamer");
             break;
 
     }
@@ -22,10 +22,10 @@ module.exports.run = (client, message, args, queue, searcher) => {
 
 }
 
-function promo(message, args){
+function promo(message, args, rolename = ""){
 
-    let role = message.guild.roles.cache.find(role => role.name === args[0])
-    (!role)
+    let role = message.guild.roles.cache.find(role => role.name === rolename)
+    if (!role)
         return message.channel.send(`The role ${args[0]} is not a role`)
 
     message.member.roles.add(role);
