@@ -22,7 +22,7 @@ module.exports.run = (client, message, args, queue, searcher) => {
 
 }
 
-function promo(args){
+function promo(message, args){
     
     let role = message.guild.roles.cache.find(role => role.name === args[0])
     
