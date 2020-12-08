@@ -14,7 +14,12 @@ module.exports.run = async (client, message, args, queue, searcher) => {
             await ytpl(url).then(async playlist => {
                 message.channel.send(`The playlist: "${playlist.title}" has been added`)
                 playlist.items.forEach(async item => {
-                    await videoHandler(await ytdl.getInfo(item.shortUrl), message, vc, true);
+                    try {
+                        await videoHandler(await ytdl.getInfo(item.shortUrl), message, vc, true);
+                    }catch(err){
+                        message.channel.send(`Cannot queue song :c \n ${err} `)
+                        console.log(err)
+                    }    
                 })
             })
         }catch(err){
@@ -25,8 +30,14 @@ module.exports.run = async (client, message, args, queue, searcher) => {
         let result = await searcher.search(args.join(" "), { type: "video" })
         if(result.first == null)
             return message.channel.send("There are no results found");
+        try {
         let songInfo = await ytdl.getInfo(result.first.url);
         return videoHandler(songInfo, message, vc)
+        }catch(err){
+            message.channel.send(`Cannot queue song :c \n ${err} `)
+            console.log(err)
+        }
+
     }
 
     async function videoHandler(songInfo, message, vc, playlist = false){
@@ -73,6 +84,7 @@ module.exports.run = async (client, message, args, queue, searcher) => {
                 .setTitle("Song Added")
                 .addField(song.title, "-----------")
                 .addField("Song duration: ", dur)
+                .addField("Song Place", serverQueue.songs.lastIndexOf(song) + 1)
                 .setThumbnail(song.thumbnail)
                 .setColor("PURPLE")
             return message.channel.send(msg);
