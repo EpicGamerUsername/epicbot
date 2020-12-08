@@ -3,7 +3,6 @@ const ytpl = require('ytpl')
 const Discord = require('discord.js')
 
 module.exports.run = async (client, message, args, queue, searcher) => {
-    let tries = 0;
     const vc = message.member.voice.channel;
     if(!vc)
         return message.channel.send("Please join a voice channel first");
