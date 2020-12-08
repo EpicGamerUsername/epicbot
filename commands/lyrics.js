@@ -2,22 +2,24 @@ const lfinder = require('lyrics-finder')
 const Discord = require('discord.js')
 
 module.exports.run = async (client, message, args, queue, searcher) => {
-    /*if(args.length < 1)
+    if(args.length < 1)
         return message.channel.send("Please use the command like !lyrics <artist name>")
     let artist = args.join(" ")
     let songname = '';
-    let filter = m => m.content.includes("aaskfnmn")
-    let collector = message.channel.createMessageCollector(filter, {max: 1, time: 6000})
-    
-    collector.on('collect', c => {
-        console.log(c.content)
-    })
+    let filter = m => m.author.id === message.author.id;
 
-    collector.on('end', collected => {
-        console.log("ended")
+    message.channel.send("Please enter the song name now")
+    message.channel.awaitMessages(filter, {max: 1, time: 10000}).then(collected => {
+        console.log(collected.first().content)
+        songname = collected.first().content;
+        lyrics(artist, songname, message)
     })
-    //let lyrics = await lfinder(args[0], song_name) || "Not Found!";
-    //message.channel.send(lyrics)*/
+}
+
+async function lyrics(artist, songname, message){
+    console.log(`ARTIST: ${artist}, SONGNAME: ${songname}`)
+    let lyrics = await lfinder(artist, songname) || "Not Found!";
+    message.channel.send(lyrics, { split: true })
 }
 module.exports.config = {
     name: "lyrics",
