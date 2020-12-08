@@ -23,9 +23,11 @@ module.exports.run = (client, message, args, queue, searcher) => {
 }
 
 function promo(message, args){
-    
+
     let role = message.guild.roles.cache.find(role => role.name === args[0])
-    
+    (!role)
+        return message.channel.send(`The role ${args[0]} is not a role`)
+
     message.member.roles.add(role);
 }
 
