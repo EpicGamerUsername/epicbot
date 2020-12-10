@@ -7,7 +7,7 @@ const fs = require('fs')
 const { YTSearcher } = require('ytsearcher');
 
 const searcher = new YTSearcher({
-    key: "AIzaSyCo41pba4U2DSoWhBxSHYj1R1apkfHXV4A",
+    key: "AIzaSyCidDNsX6teNLjmZCxtSKd1Y4w6kq5sugY",
     revealed: true
 });
 
@@ -37,7 +37,6 @@ client.on("ready", () => {
     console.log("I am online!")
 })
 
-
 client.on("guildMemberAdd", member => {
     let role = member.guild.roles.cache.find(role => role.name === "Epic Gamers")
     member.roles.add(role)
@@ -48,8 +47,6 @@ client.on("message", async(message) => {
     const prefix = '!';
 
     if(!message.content.startsWith(prefix)) return
-
-    const serverQueue = queue.get(message.guild.id);
     
     const args = message.content.slice(prefix.length).trim().split(/ +/g)
     const command = args.shift().toLowerCase();
