@@ -37,7 +37,13 @@ client.on("ready", () => {
     console.log("I am online!")
 })
 
+
 client.on("guildMemberAdd", member => {
+    if (member.user.bot){
+        let role = member.guild.roles.cache.find(role => role.name === "Dumbass")
+        return member.roles.add(role)
+    }
+
     let role = member.guild.roles.cache.find(role => role.name === "Epic Gamers")
     member.roles.add(role)
 })
