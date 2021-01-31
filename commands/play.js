@@ -2,6 +2,7 @@ const ytdl = require('ytdl-core');
 const ytpl = require('ytpl')
 const Discord = require('discord.js')
 
+let timer;
 module.exports.run = async (client, message, args, queue, searcher) => {
     const vc = message.member.voice.channel;
     if(!vc)
@@ -35,12 +36,13 @@ module.exports.run = async (client, message, args, queue, searcher) => {
 
     }
     async function videoHandler(songInfo, message, vc, playlist = false){
+        clearTimeout(timer);
         const serverQueue = queue.get(message.guild.id);
         const song = {
             title: songInfo.videoDetails.title,
             url: songInfo.videoDetails.video_url,
             vLength: songInfo.videoDetails.lengthSeconds,
-            thumbnail: songInfo.videoDetails.thumbnail.thumbnails[3].url
+            thumbnail: songInfo.videoDetails.thumbnails[3].url
         }
         if(!serverQueue){
             const queueConstructor = {
@@ -70,6 +72,8 @@ module.exports.run = async (client, message, args, queue, searcher) => {
             }
         }else{
             serverQueue.songs.push(song);
+            if(serverQueue.songs.length === 1)
+                play (message.guild, serverQueue.songs[0])
             if(playlist) return undefined
 
 
@@ -87,9 +91,11 @@ module.exports.run = async (client, message, args, queue, searcher) => {
     function play(guild, song){
         const serverQueue = queue.get(guild.id);
         if(!song){
-            const serverQueue = queue.get(message.guild.id)
-            serverQueue.vChannel.leave();   
-            queue.delete(message.guild.id);
+            timer = setTimeout(function() {
+                serverQueue.txtChannel.send("I didn't have anything to do so I just left!");
+                serverQueue.vChannel.leave();
+                queue.delete(guild.id);
+            }, 5000)
             return;
         }
         const dispatcher = serverQueue.connection
