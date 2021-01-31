@@ -34,7 +34,6 @@ module.exports.run = async (client, message, args, queue, searcher) => {
         }
 
     }
-
     async function videoHandler(songInfo, message, vc, playlist = false){
         const serverQueue = queue.get(message.guild.id);
         const song = {
@@ -88,8 +87,9 @@ module.exports.run = async (client, message, args, queue, searcher) => {
     function play(guild, song){
         const serverQueue = queue.get(guild.id);
         if(!song){
-            serverQueue.vChannel.leave();
-            queue.delete(guild.id);
+            const serverQueue = queue.get(message.guild.id)
+            serverQueue.vChannel.leave();   
+            queue.delete(message.guild.id);
             return;
         }
         const dispatcher = serverQueue.connection
@@ -101,10 +101,11 @@ module.exports.run = async (client, message, args, queue, searcher) => {
                 else if(serverQueue.loopall){
                     serverQueue.songs.push(serverQueue.songs[0])
                     serverQueue.songs.shift()
+                    play(guild, serverQueue.songs[0]);
                 }else{
                     serverQueue.songs.shift()
+                    play(guild, serverQueue.songs[0]);
                 }
-                play(guild, serverQueue.songs[0]);
             })
             let dur = `${parseInt(serverQueue.songs[0].vLength / 60)}:${serverQueue.songs[0].vLength - 60 * parseInt(serverQueue.songs[0].vLength / 60)}`
             let msg = new Discord.MessageEmbed()
